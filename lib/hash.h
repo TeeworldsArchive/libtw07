@@ -144,6 +144,8 @@ int md5_comp(MD5_DIGEST digest1, MD5_DIGEST digest2)
 	return memcmp(digest1.data, digest2.data, sizeof(digest1.data));
 }
 
+// SHA-256. Adapted from https://github.com/kalven/sha-2, which was adapted
+// from LibTomCrypt. This code is Public Domain.
 typedef uint32_t u32;
 typedef uint64_t u64;
 typedef SHA256_CTX sha256_state;
