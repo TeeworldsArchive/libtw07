@@ -237,7 +237,7 @@ int libtw07_datafile_reader_open(libtw07_datafileReader *pReader, const char *pF
 	pReader->m_pDataFile = pTmpDataFile;
 
 #if defined(CONF_ARCH_ENDIAN_BIG)
-	swap_endian(pReader->m_pDataFile->m_pData, sizeof(int), minimum((uint32_t) Header.m_Swaplen, (uint32_t) Size) / sizeof(int));
+	swap_endian(pReader->m_pDataFile->m_pData, sizeof(int), libtw07_minimum((uint32_t) Header.m_Swaplen, (uint32_t) Size) / sizeof(int));
 #endif
 
 	//if(DEBUG)

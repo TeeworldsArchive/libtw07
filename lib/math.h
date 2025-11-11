@@ -34,29 +34,29 @@
 extern "C" {
 #endif
 
-#define clamp(val, min, max) ((val < min) ? min : ((val > max) ? max : val))
+#define libtw07_clamp(val, min, max) ((val < min) ? min : ((val > max) ? max : val))
 
-inline float sign(float f)
+inline float libtw07_sign(float f)
 {
 	return f < 0.0f ? -1.0f : 1.0f;
 }
 
-inline int round_to_int(float f)
+inline int libtw07_round_to_int(float f)
 {
 	if(f > 0.0f)
 		return (int)(f + 0.5f);
 	return (int)(f - 0.5f);
 }
 
-#define mix(a, b, amount) (a + (b - a) * amount)
-#define bezier(p0, p1, p2, p3, amount) mix(mix(mix(p0, p1, amount), mix(p1, p2, amount), amount), mix(mix(p1, p2, amount), mix(p2, p3, amount), amount), amount)
+#define libtw07_mix(a, b, amount) (a + (b - a) * amount)
+#define libtw07_bezier(p0, p1, p2, p3, amount) libtw07_mix(libtw07_mix(libtw07_mix(p0, p1, amount), libtw07_mix(p1, p2, amount), amount), libtw07_mix(libtw07_mix(p1, p2, amount), libtw07_mix(p2, p3, amount), amount), amount)
 
-inline int random_int()
+inline int libtw07_random_int()
 {
 	return ((rand() & 0x7fff) << 16) | (rand() & 0xffff);
 }
 
-inline float random_float()
+inline float libtw07_random_float()
 {
 	return rand() / (float)RAND_MAX;
 }
@@ -64,26 +64,26 @@ inline float random_float()
 const int fxpscale = 1 << 10;
 
 // float to fixed
-inline int f2fx(float v)
+inline int libtw07_f2fx(float v)
 {
 	return (int)(v * fxpscale);
 }
-inline float fx2f(int v)
+inline float libtw07_fx2f(int v)
 {
 	return v / (float)fxpscale;
 }
 
 // int to fixed
-inline int i2fx(int v)
+inline int libtw07_i2fx(int v)
 {
 	return v * fxpscale;
 }
-inline int fx2i(int v)
+inline int libtw07_fx2i(int v)
 {
 	return v / fxpscale;
 }
 
-inline int gcd(int a, int b)
+inline int libtw07_gcd(int a, int b)
 {
 	while(b != 0)
 	{
@@ -96,10 +96,10 @@ inline int gcd(int a, int b)
 
 const float pi = 3.1415926535897932384626433f;
 
-#define minimum(a, b) (a < b ? a : b)
-#define maximum(a, b) (a > b ? a : b)
+#define libtw07_minimum(a, b) (a < b ? a : b)
+#define libtw07_maximum(a, b) (a > b ? a : b)
 
-#define absolute(a) (a < 0 ? -a : a)
+#define libtw07_absolute(a) (a < 0 ? -a : a)
 
 #ifdef __cplusplus
 }
