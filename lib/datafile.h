@@ -44,7 +44,7 @@
 extern "C" {
 #endif
 
-static const int DEBUG=0;
+static const int LIBTW07_DATAFILE_DEBUG=0;
 
 struct _libtw07_datafileItemType
 {
@@ -240,7 +240,7 @@ int libtw07_datafile_reader_open(libtw07_datafileReader *pReader, const char *pF
 	swap_endian(pReader->m_pDataFile->m_pData, sizeof(int), libtw07_minimum((uint32_t) Header.m_Swaplen, (uint32_t) Size) / sizeof(int));
 #endif
 
-	//if(DEBUG)
+	//if(LIBTW07_DATAFILE_DEBUG)
 	{
 		libtw07_print("datafile", "allocsize=%d", (uint32_t) AllocSize);
 		libtw07_print("datafile", "readsize=%d", ReadSize);
@@ -264,13 +264,13 @@ int libtw07_datafile_reader_open(libtw07_datafileReader *pReader, const char *pF
 	return 0;
 }
 
-int libtw07_datafile_numData(libtw07_datafileReader *pReader)
+int libtw07_datafile_reader_numData(libtw07_datafileReader *pReader)
 {
 	if(!pReader->m_pDataFile) { return 0; }
 	return pReader->m_pDataFile->m_Header.m_NumRawData;
 }
 
-int _libtw07_datafile_getFileDataSize(libtw07_datafileReader *pReader, int Index)
+int _libtw07_datafile_reader_getFileDataSize(libtw07_datafileReader *pReader, int Index)
 {
 	if(!pReader->m_pDataFile) { return 0; }
 
@@ -279,7 +279,7 @@ int _libtw07_datafile_getFileDataSize(libtw07_datafileReader *pReader, int Index
 	return pReader->m_pDataFile->m_Info.m_pDataOffsets[Index + 1] - pReader->m_pDataFile->m_Info.m_pDataOffsets[Index];
 }
 
-int libtw07_datafile_getDataSize(libtw07_datafileReader *pReader, int Index)
+int libtw07_datafile_reader_getDataSize(libtw07_datafileReader *pReader, int Index)
 {
 	if(Index < 0 || Index >= pReader->m_pDataFile->m_Header.m_NumRawData)
 	{
@@ -294,13 +294,13 @@ int libtw07_datafile_getDataSize(libtw07_datafileReader *pReader, int Index)
 		}
 		else
 		{
-			return _libtw07_datafile_getFileDataSize(pReader, Index);
+			return _libtw07_datafile_reader_getFileDataSize(pReader, Index);
 		}
 	}
 	return pReader->m_pDataFile->m_pDataSizes[Index];
 }
 
-void *_libtw07_datafile_getDataImpl(libtw07_datafileReader *pReader, int Index, int Swap)
+void *_libtw07_datafile_reader_getDataImpl(libtw07_datafileReader *pReader, int Index, int Swap)
 {
 	if(!pReader->m_pDataFile) { return 0; }
 
@@ -311,7 +311,7 @@ void *_libtw07_datafile_getDataImpl(libtw07_datafileReader *pReader, int Index, 
 	if(!pReader->m_pDataFile->m_ppDataPtrs[Index])
 	{
 		// fetch the data size
-		int DataSize = libtw07_datafile_getDataSize(pReader, Index);
+		int DataSize = libtw07_datafile_reader_getDataSize(pReader, Index);
 #if defined(CONF_ARCH_ENDIAN_BIG)
 		int SwapSize = DataSize;
 #endif
@@ -360,17 +360,17 @@ void *_libtw07_datafile_getDataImpl(libtw07_datafileReader *pReader, int Index, 
 	return pReader->m_pDataFile->m_ppDataPtrs[Index];
 }
 
-void *libtw07_datafile_getData(libtw07_datafileReader *pReader, int Index)
+void *libtw07_datafile_reader_getData(libtw07_datafileReader *pReader, int Index)
 {
-	return _libtw07_datafile_getDataImpl(pReader, Index, 0);
+	return _libtw07_datafile_reader_getDataImpl(pReader, Index, 0);
 }
 
-void *libtw07_datafile_getDataSwapped(libtw07_datafileReader *pReader, int Index)
+void *libtw07_datafile_reader_getDataSwapped(libtw07_datafileReader *pReader, int Index)
 {
-	return _libtw07_datafile_getDataImpl(pReader, Index, 1);
+	return _libtw07_datafile_reader_getDataImpl(pReader, Index, 1);
 }
 
-void libtw07_datafile_unloadData(libtw07_datafileReader *pReader,int Index)
+void libtw07_datafile_reader_unloadData(libtw07_datafileReader *pReader,int Index)
 {
 	if(Index < 0 || Index >= pReader->m_pDataFile->m_Header.m_NumRawData)
 		return;
@@ -380,20 +380,20 @@ void libtw07_datafile_unloadData(libtw07_datafileReader *pReader,int Index)
 	pReader->m_pDataFile->m_pDataSizes[Index] = 0;
 }
 
-void libtw07_datafile_replaceData(libtw07_datafileReader *pReader, int Index, char *pData, int Size)
+void libtw07_datafile_reader_replaceData(libtw07_datafileReader *pReader, int Index, char *pData, int Size)
 {
 	if(Index < 0 || Index >= pReader->m_pDataFile->m_Header.m_NumRawData)
 		return;
 
 	// make sure the data has been loaded
-	_libtw07_datafile_getDataImpl(pReader, Index, 0);
+	_libtw07_datafile_reader_getDataImpl(pReader, Index, 0);
 
-	libtw07_datafile_unloadData(pReader, Index);
+	libtw07_datafile_reader_unloadData(pReader, Index);
 	pReader->m_pDataFile->m_ppDataPtrs[Index] = pData;
 	pReader->m_pDataFile->m_pDataSizes[Index] = Size;
 }
 
-int _libtw07_datafile_getFileItemSize(libtw07_datafileReader *pReader, int Index)
+int _libtw07_datafile_reader_getFileItemSize(libtw07_datafileReader *pReader, int Index)
 {
 	if(!pReader->m_pDataFile) { return 0; }
 	if(Index == pReader->m_pDataFile->m_Header.m_NumItems-1)
@@ -401,9 +401,9 @@ int _libtw07_datafile_getFileItemSize(libtw07_datafileReader *pReader, int Index
 	return pReader->m_pDataFile->m_Info.m_pItemOffsets[Index+1] - pReader->m_pDataFile->m_Info.m_pItemOffsets[Index];
 }
 
-int libtw07_datafile_getItemSize(libtw07_datafileReader *pReader, int Index)
+int libtw07_datafile_reader_getItemSize(libtw07_datafileReader *pReader, int Index)
 {
-	int FileSize = _libtw07_datafile_getFileItemSize(pReader, Index);
+	int FileSize = _libtw07_datafile_reader_getFileItemSize(pReader, Index);
 	if(FileSize == 0)
 	{
 		return 0;
@@ -411,7 +411,7 @@ int libtw07_datafile_getItemSize(libtw07_datafileReader *pReader, int Index)
 	return FileSize - sizeof(libtw07_datafileItem);
 }
 
-void *libtw07_datafile_getItem(libtw07_datafileReader *pReader, int Index, int *pType, int *pID)
+void *libtw07_datafile_reader_getItem(libtw07_datafileReader *pReader, int Index, int *pType, int *pID)
 {
 	if(!pReader->m_pDataFile || Index < 0 || Index >= pReader->m_pDataFile->m_Header.m_NumItems)
 	{
@@ -423,7 +423,7 @@ void *libtw07_datafile_getItem(libtw07_datafileReader *pReader, int Index, int *
 		return 0;
 	}
 
-	libtw07_datafileItem *i = (libtw07_datafileItem *) pReader->m_pDataFile->m_Info.m_pItemStart + pReader->m_pDataFile->m_Info.m_pItemOffsets[Index];
+	libtw07_datafileItem *i = (libtw07_datafileItem *) (pReader->m_pDataFile->m_Info.m_pItemStart + pReader->m_pDataFile->m_Info.m_pItemOffsets[Index]);
 	if(pType)
 		*pType = (i->m_TypeAndID>>16)&0xffff; // remove sign extention
 	if(pID)
@@ -431,7 +431,7 @@ void *libtw07_datafile_getItem(libtw07_datafileReader *pReader, int Index, int *
 	return (void *)(i+1);
 }
 
-void libtw07_datafile_getType(libtw07_datafileReader *pReader, int Type, int *pStart, int *pNum)
+void libtw07_datafile_reader_getType(libtw07_datafileReader *pReader, int Type, int *pStart, int *pNum)
 {
 	*pStart = 0;
 	*pNum = 0;
@@ -450,23 +450,23 @@ void libtw07_datafile_getType(libtw07_datafileReader *pReader, int Type, int *pS
 	}
 }
 
-void *libtw07_datafile_findItem(libtw07_datafileReader *pReader, int Type, int ID)
+void *libtw07_datafile_reader_findItem(libtw07_datafileReader *pReader, int Type, int ID)
 {
 	if(!pReader->m_pDataFile) return 0;
 
 	int Start, Num;
-	libtw07_datafile_getType(pReader, Type, &Start, &Num);
+	libtw07_datafile_reader_getType(pReader, Type, &Start, &Num);
 	for(int i = 0; i < Num; i++)
 	{
 		int ItemID;
-		void *pItem = libtw07_datafile_getItem(pReader, Start+i,0, &ItemID);
+		void *pItem = libtw07_datafile_reader_getItem(pReader, Start+i,0, &ItemID);
 		if(ID == ItemID)
 			return pItem;
 	}
 	return 0;
 }
 
-int libtw07_datafile_numItems(libtw07_datafileReader *pReader)
+int libtw07_datafile_reader_numItems(libtw07_datafileReader *pReader)
 {
 	if(!pReader->m_pDataFile) return 0;
 	return pReader->m_pDataFile->m_Header.m_NumItems;
@@ -491,19 +491,19 @@ int libtw07_datafile_reader_close(libtw07_datafileReader *pReader)
 	return 0;
 }
 
-SHA256_DIGEST libtw07_datafile_sha256(libtw07_datafileReader *pReader)
+SHA256_DIGEST libtw07_datafile_reader_sha256(libtw07_datafileReader *pReader)
 {
 	if(!pReader->m_pDataFile) return SHA256_ZEROED;
 	return pReader->m_pDataFile->m_Sha256;
 }
 
-uint32_t libtw07_datafile_crc(libtw07_datafileReader *pReader)
+uint32_t libtw07_datafile_reader_crc(libtw07_datafileReader *pReader)
 {
 	if(!pReader->m_pDataFile) return 0xFFFFFFFF;
 	return pReader->m_pDataFile->m_Crc;
 }
 
-int libtw07_datafile_checkSha256(FILE *File, const void *pSha256)
+int libtw07_datafile_reader_checkSha256(FILE *File, const void *pSha256)
 {
 	// read the hash of the file
 	SHA256_CTX Sha256Ctx;
@@ -609,7 +609,7 @@ int libtw07_datafile_writer_open(libtw07_datafileWriter *pWriter, const char *pF
 	return 0;
 }
 
-int libtw07_datafile_addItem(libtw07_datafileWriter *pWriter, int Type, int ID, int Size, const void *pData)
+int libtw07_datafile_writer_addItem(libtw07_datafileWriter *pWriter, int Type, int ID, int Size, const void *pData)
 {
 	if(!pWriter->m_File) return 0;
 
@@ -645,7 +645,7 @@ int libtw07_datafile_addItem(libtw07_datafileWriter *pWriter, int Type, int ID, 
 	return pWriter->m_NumItems-1;
 }
 
-int libtw07_datafile_addData(libtw07_datafileWriter *pWriter, int Size, const void *pData)
+int libtw07_datafile_writer_addData(libtw07_datafileWriter *pWriter, int Size, const void *pData)
 {
 	if(!pWriter->m_File) return 0;
 
@@ -672,7 +672,7 @@ int libtw07_datafile_addData(libtw07_datafileWriter *pWriter, int Size, const vo
 	return pWriter->m_NumDatas-1;
 }
 
-int libtw07_datafile_addDataSwapped(libtw07_datafileWriter *pWriter, int Size, const void *pData)
+int libtw07_datafile_writer_addDataSwapped(libtw07_datafileWriter *pWriter, int Size, const void *pData)
 {
 	libtw07_dbg_assert(Size%sizeof(int) == 0, "incorrect boundary");
 
@@ -680,11 +680,11 @@ int libtw07_datafile_addDataSwapped(libtw07_datafileWriter *pWriter, int Size, c
 	void *pSwapped = malloc(Size); // temporary buffer that we use during compression
 	memcpy(pSwapped, pData, Size);
 	swap_endian(pSwapped, sizeof(int), Size/sizeof(int));
-	int Index = libtw07_datafile_addData(pWriter, Size, pSwapped);
+	int Index = libtw07_datafile_writer_addData(pWriter, Size, pSwapped);
 	free(pSwapped);
 	return Index;
 #else
-	return libtw07_datafile_addData(pWriter, Size, pData);
+	return libtw07_datafile_writer_addData(pWriter, Size, pData);
 #endif
 }
 
@@ -699,13 +699,13 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 	libtw07_datafileHeader Header;
 
 	// we should now write this file!
-	if(DEBUG)
+	if(LIBTW07_DATAFILE_DEBUG)
 		libtw07_print("datafile", "writing");
 
 	// calculate sizes
 	for(int i = 0; i < pWriter->m_NumItems; i++)
 	{
-		if(DEBUG)
+		if(LIBTW07_DATAFILE_DEBUG)
 			libtw07_print("datafile", "item=%d size=%d (%d)", i, pWriter->m_pItems[i].m_Size, (int)(pWriter->m_pItems[i].m_Size+sizeof(libtw07_datafileItem)));
 		ItemSize += pWriter->m_pItems[i].m_Size + sizeof(libtw07_datafileItem);
 	}
@@ -723,7 +723,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 
 	(void)SwapSize;
 
-	if(DEBUG)
+	if(LIBTW07_DATAFILE_DEBUG)
 		libtw07_print("datafile", "num_m_aItemTypes=%d TypesSize=%d m_aItemsize=%d DataSize=%d", pWriter->m_NumItemTypes, TypesSize, ItemSize, DataSize);
 
 	// construct Header
@@ -742,7 +742,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 		Header.m_DataSize = DataSize;
 
 		// write Header
-		if(DEBUG)
+		if(LIBTW07_DATAFILE_DEBUG)
 			libtw07_print("datafile", "HeaderSize=%d", (int)sizeof(Header));
 #if defined(CONF_ARCH_ENDIAN_BIG)
 		swap_endian(&Header, sizeof(int), sizeof(Header)/sizeof(int));
@@ -760,7 +760,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 			Info.m_Type = i;
 			Info.m_Start = Count;
 			Info.m_Num = pWriter->m_pItemTypes[i].m_Num;
-			if(DEBUG)
+			if(LIBTW07_DATAFILE_DEBUG)
 				libtw07_print("datafile", "writing type=%x start=%d num=%d", Info.m_Type, Info.m_Start, Info.m_Num);
 #if defined(CONF_ARCH_ENDIAN_BIG)
 			swap_endian(&Info, sizeof(int), sizeof(libtw07_datafileItemType)/sizeof(int));
@@ -779,7 +779,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 			int k = pWriter->m_pItemTypes[i].m_First;
 			while(k != -1)
 			{
-				if(DEBUG)
+				if(LIBTW07_DATAFILE_DEBUG)
 					libtw07_print("datafile", "writing item offset num=%d offset=%d", k, Offset);
 				int Temp = Offset;
 #if defined(CONF_ARCH_ENDIAN_BIG)
@@ -797,7 +797,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 	// write data offsets
 	for(int i = 0, Offset = 0; i < pWriter->m_NumDatas; i++)
 	{
-		if(DEBUG)
+		if(LIBTW07_DATAFILE_DEBUG)
 			libtw07_print("datafile", "writing data offset num=%d offset=%d", i, Offset);
 		int Temp = Offset;
 #if defined(CONF_ARCH_ENDIAN_BIG)
@@ -810,7 +810,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 	// write data uncompressed sizes
 	for(int i = 0; i < pWriter->m_NumDatas; i++)
 	{
-		if(DEBUG)
+		if(LIBTW07_DATAFILE_DEBUG)
 			libtw07_print("datafile", "writing data uncompressed size num=%d size=%d", i, pWriter->m_pDatas[i].m_UncompressedSize);
 		int UncompressedSize = pWriter->m_pDatas[i].m_UncompressedSize;
 #if defined(CONF_ARCH_ENDIAN_BIG)
@@ -831,7 +831,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 				libtw07_datafileItem Item;
 				Item.m_TypeAndID = (i<<16)|pWriter->m_pItems[k].m_ID;
 				Item.m_Size = pWriter->m_pItems[k].m_Size;
-				if(DEBUG)
+				if(LIBTW07_DATAFILE_DEBUG)
 					libtw07_print("datafile", "writing item type=%x idx=%d id=%d size=%d", i, k, pWriter->m_pItems[k].m_ID, pWriter->m_pItems[k].m_Size);
 
 #if defined(CONF_ARCH_ENDIAN_BIG)
@@ -850,7 +850,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 	// write data
 	for(int i = 0; i < pWriter->m_NumDatas; i++)
 	{
-		if(DEBUG)
+		if(LIBTW07_DATAFILE_DEBUG)
 			libtw07_print("datafile", "writing data id=%d size=%d", i, pWriter->m_pDatas[i].m_CompressedSize);
 		fwrite(pWriter->m_pDatas[i].m_pCompressedData, 1, pWriter->m_pDatas[i].m_CompressedSize, pWriter->m_File);
 	}
@@ -864,7 +864,7 @@ int libtw07_datafile_writer_finish(libtw07_datafileWriter *pWriter)
 	fclose(pWriter->m_File);
 	pWriter->m_File = NULL;
 
-	if(DEBUG)
+	if(LIBTW07_DATAFILE_DEBUG)
 		libtw07_print("datafile", "done");
 	return 1;
 }

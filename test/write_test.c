@@ -21,32 +21,23 @@
  *
  */
 #include "../lib/datafile.h"
-
 #include "test.h"
 
 int main(int argc, const char **argv)
 {
-    libtw07_datafileReader Reader;
-    libtw07_datafile_reader_init(&Reader);
-    libtw07_datafile_reader_open(&Reader, "test.file");
+    libtw07_datafileWriter Writer;
+    libtw07_datafile_writer_init(&Writer);
+    libtw07_datafile_writer_open(&Writer, "test.file");
 
-    uint32_t Crc = libtw07_datafile_reader_crc(&Reader);
-    SHA256_DIGEST Sha256 = libtw07_datafile_reader_sha256(&Reader);
+    for(int i = 0; i < 10; i++)
+    {
+        libtw07_testFile File;
+        File.Flag = 1 << i;
+        strncpy(File.String, "Hello world!", sizeof(File.String));
+        libtw07_datafile_writer_addItem(&Writer, 0, i, sizeof(File), &File);
+    }
 
-    char aSha256[SHA256_MAXSTRSIZE];
-    sha256_str(Sha256, aSha256, sizeof(aSha256));
-
-    libtw07_print("test", "crc is %u, sha256 is %s", Crc, aSha256);
-
-	int Start, Num;
-	libtw07_datafile_reader_getType(&Reader, 0, &Start, &Num);
-	for(int i = 0; i < Num; i++)
-	{
-		libtw07_testFile *pFile = (libtw07_testFile *) libtw07_datafile_reader_getItem(&Reader, Start + i, 0, 0);
-        libtw07_print("test", "file%d flag is %d, string is %s", i, pFile->Flag, pFile->String);
-	}
-
-    libtw07_datafile_reader_close(&Reader);
-    libtw07_datafile_reader_destroy(&Reader);
+    libtw07_datafile_writer_finish(&Writer);
+    libtw07_datafile_writer_destroy(&Writer);
     return 0;
 }

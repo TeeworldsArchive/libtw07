@@ -1,2 +1,6 @@
 .vscode
-test/test
+read_test
+write_test
+!read_test.c
+!write_test.c
+test.file

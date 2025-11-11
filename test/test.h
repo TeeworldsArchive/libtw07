@@ -20,33 +20,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  */
-#include "../lib/datafile.h"
+#ifndef LIBTW07_TEST_H
+#define LIBTW07_TEST_H
 
-#include "test.h"
-
-int main(int argc, const char **argv)
+struct __libtw07_testFile
 {
-    libtw07_datafileReader Reader;
-    libtw07_datafile_reader_init(&Reader);
-    libtw07_datafile_reader_open(&Reader, "test.file");
+    int Flag;
+    char String[32];
+};
+typedef struct __libtw07_testFile libtw07_testFile;
 
-    uint32_t Crc = libtw07_datafile_reader_crc(&Reader);
-    SHA256_DIGEST Sha256 = libtw07_datafile_reader_sha256(&Reader);
-
-    char aSha256[SHA256_MAXSTRSIZE];
-    sha256_str(Sha256, aSha256, sizeof(aSha256));
-
-    libtw07_print("test", "crc is %u, sha256 is %s", Crc, aSha256);
-
-	int Start, Num;
-	libtw07_datafile_reader_getType(&Reader, 0, &Start, &Num);
-	for(int i = 0; i < Num; i++)
-	{
-		libtw07_testFile *pFile = (libtw07_testFile *) libtw07_datafile_reader_getItem(&Reader, Start + i, 0, 0);
-        libtw07_print("test", "file%d flag is %d, string is %s", i, pFile->Flag, pFile->String);
-	}
-
-    libtw07_datafile_reader_close(&Reader);
-    libtw07_datafile_reader_destroy(&Reader);
-    return 0;
-}
+#endif //LIBTW07_TEST_H
