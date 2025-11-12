@@ -1,6 +1,8 @@
 .vscode
+map_read_test
 read_test
 write_test
+!map_read_test.c
 !read_test.c
 !write_test.c
 test.file

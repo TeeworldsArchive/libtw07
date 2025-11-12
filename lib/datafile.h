@@ -46,22 +46,22 @@ extern "C" {
 
 static const int LIBTW07_DATAFILE_DEBUG=0;
 
-struct _libtw07_datafileItemType
+struct libtw07_datafileItemType
 {
 	int m_Type;
 	int m_Start;
 	int m_Num;
 };
-typedef struct _libtw07_datafileItemType libtw07_datafileItemType;
+typedef struct libtw07_datafileItemType libtw07_datafileItemType;
 
-struct _libtw07_datafileItem
+struct libtw07_datafileItem
 {
 	int m_TypeAndID;
 	int m_Size;
 };
-typedef struct _libtw07_datafileItem libtw07_datafileItem;
+typedef struct libtw07_datafileItem libtw07_datafileItem;
 
-struct _libtw07_datafileHeader
+struct libtw07_datafileHeader
 {
 	char m_aID[4];
 	int m_Version;
@@ -73,9 +73,9 @@ struct _libtw07_datafileHeader
 	int m_ItemSize;
 	int m_DataSize;
 };
-typedef struct _libtw07_datafileHeader libtw07_datafileHeader;
+typedef struct libtw07_datafileHeader libtw07_datafileHeader;
 
-struct _libtw07_datafileData
+struct libtw07_datafileData
 {
 	int m_NumItemTypes;
 	int m_NumItems;
@@ -84,9 +84,9 @@ struct _libtw07_datafileData
 	int m_DataSize;
 	char m_aStart[4];
 };
-typedef struct _libtw07_datafileData libtw07_datafileData;
+typedef struct libtw07_datafileData libtw07_datafileData;
 
-struct _libtw07_datafileInfo
+struct libtw07_datafileInfo
 {
 	libtw07_datafileItemType *m_pItemTypes;
 	int *m_pItemOffsets;
@@ -96,9 +96,9 @@ struct _libtw07_datafileInfo
 	char *m_pItemStart;
 	char *m_pDataStart;
 };
-typedef struct _libtw07_datafileInfo libtw07_datafileInfo;
+typedef struct libtw07_datafileInfo libtw07_datafileInfo;
 
-struct _libtw07_datafile
+struct libtw07_datafile
 {
 	FILE *m_File;
 	SHA256_DIGEST m_Sha256;
@@ -110,13 +110,13 @@ struct _libtw07_datafile
 	int *m_pDataSizes;
 	char *m_pData;
 };
-typedef struct _libtw07_datafile libtw07_datafile;
+typedef struct libtw07_datafile libtw07_datafile;
 
-struct _libtw07_datafileReader
+struct libtw07_datafileReader
 {
 	libtw07_datafile *m_pDataFile;
 };
-typedef struct _libtw07_datafileReader libtw07_datafileReader;
+typedef struct libtw07_datafileReader libtw07_datafileReader;
 
 int libtw07_datafile_reader_open(libtw07_datafileReader *pReader, const char *pFilename);
 int libtw07_datafile_reader_close(libtw07_datafileReader *pReader);
@@ -129,6 +129,13 @@ void libtw07_datafile_reader_init(libtw07_datafileReader *pReader)
 void libtw07_datafile_reader_destroy(libtw07_datafileReader *pReader)
 {
 	libtw07_datafile_reader_close(pReader);
+}
+
+int libtw07_datafile_reader_isOpen(libtw07_datafileReader *pReader)
+{
+	if(pReader->m_pDataFile)
+		return 0;
+	return -1;
 }
 
 int libtw07_datafile_reader_open(libtw07_datafileReader *pReader, const char *pFilename)
@@ -524,15 +531,15 @@ int libtw07_datafile_reader_checkSha256(FILE *File, const void *pSha256)
 	return !sha256_comp(*(const SHA256_DIGEST *)pSha256, Sha256);
 }
 
-struct _libtw07_datafileWriter_dataInfo
+struct libtw07_datafileWriter_dataInfo
 {
 	int m_UncompressedSize;
 	int m_CompressedSize;
 	void *m_pCompressedData;
 };
-typedef struct _libtw07_datafileWriter_dataInfo libtw07_datafileWriter_dataInfo;
+typedef struct libtw07_datafileWriter_dataInfo libtw07_datafileWriter_dataInfo;
 
-struct _libtw07_datafileWriter_itemInfo
+struct libtw07_datafileWriter_itemInfo
 {
 	int m_Type;
 	int m_ID;
@@ -541,17 +548,17 @@ struct _libtw07_datafileWriter_itemInfo
 	int m_Prev;
 	void *m_pData;
 };
-typedef struct _libtw07_datafileWriter_itemInfo libtw07_datafileWriter_itemInfo;
+typedef struct libtw07_datafileWriter_itemInfo libtw07_datafileWriter_itemInfo;
 
-struct _libtw07_datafileWriter_itemTypeInfo
+struct libtw07_datafileWriter_itemTypeInfo
 {
 	int m_Num;
 	int m_First;
 	int m_Last;
 };
-typedef struct _libtw07_datafileWriter_itemTypeInfo libtw07_datafileWriter_itemTypeInfo;
+typedef struct libtw07_datafileWriter_itemTypeInfo libtw07_datafileWriter_itemTypeInfo;
 
-struct _libtw07_datafileWriter
+struct libtw07_datafileWriter
 {
 	FILE *m_File;
 	int m_NumItems;
@@ -561,7 +568,7 @@ struct _libtw07_datafileWriter
 	libtw07_datafileWriter_itemInfo *m_pItems;
 	libtw07_datafileWriter_dataInfo *m_pDatas;
 };
-typedef struct _libtw07_datafileWriter libtw07_datafileWriter;
+typedef struct libtw07_datafileWriter libtw07_datafileWriter;
 
 enum
 {

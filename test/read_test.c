@@ -20,15 +20,20 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  */
+#include "../lib/print.h"
 #include "../lib/datafile.h"
 
 #include "test.h"
 
 int main(int argc, const char **argv)
 {
+    libtw07_enable_print = 1;
+
     libtw07_datafileReader Reader;
     libtw07_datafile_reader_init(&Reader);
     libtw07_datafile_reader_open(&Reader, "test.file");
+    if(libtw07_datafile_reader_isOpen(&Reader) == -1)
+        return -1;
 
     uint32_t Crc = libtw07_datafile_reader_crc(&Reader);
     SHA256_DIGEST Sha256 = libtw07_datafile_reader_sha256(&Reader);

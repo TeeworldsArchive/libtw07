@@ -39,9 +39,14 @@
 extern "C" {
 #endif
 
+static int libtw07_enable_print = 0;
+
 // modify from dbg_msg
 int libtw07_print(const char *from, const char *fmt, ...)
 {
+	if(libtw07_enable_print == 0)
+		return -1;
+
 	printf("[%s]: ", from);
 
 	char str[1024*4];
